@@ -50,6 +50,12 @@
           <span class="value small" id="combo-status">-</span>
         </div>
 
+        <div class="panel-section" id="challenge-status-section" hidden>
+          <span class="label">DESAFÍO</span>
+          <span class="value small" id="challenge-desc"></span>
+          <span class="value small" id="challenge-progress"></span>
+        </div>
+
         <div class="panel-section controls">
           <span class="label">CONTROLS</span>
           <ul>
@@ -68,6 +74,39 @@
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
         <button id="restart-btn">Reiniciar</button>
+        <button id="menu-btn">Cambiar modo</button>
+      </div>
+    </div>
+
+    <div id="menu-overlay" class="overlay">
+      <div class="overlay-box menu-box">
+        <p id="overlay-title">ELEGIR MODO</p>
+        <div class="challenge-list">
+          <button class="challenge-btn" data-challenge="">
+            <strong>Modo normal</strong>
+            <span>Tetris clásico, sin objetivo.</span>
+          </button>
+          <button class="challenge-btn" data-challenge="lines_time">
+            <strong>Contrarreloj</strong>
+            <span>Limpia 40 líneas en 2 minutos.</span>
+          </button>
+          <button class="challenge-btn" data-challenge="garbage">
+            <strong>Basura ascendente</strong>
+            <span>Sobrevive 90s con basura subiendo cada 10s.</span>
+          </button>
+          <button class="challenge-btn" data-challenge="preset">
+            <strong>Bloques fijos</strong>
+            <span>Empieza con el tablero medio lleno.</span>
+          </button>
+          <button class="challenge-btn" data-challenge="invisible">
+            <strong>Piezas invisibles</strong>
+            <span>La pieza se vuelve invisible al tocar la pila.</span>
+          </button>
+          <button class="challenge-btn" data-challenge="reverseRotation">
+            <strong>Rotación inversa</strong>
+            <span>Desde el nivel 3, la rotación se invierte.</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

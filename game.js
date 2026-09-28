@@ -51,6 +51,20 @@ const POWERUPS = {
 };
 const POWERUP_KINDS = Object.keys(POWERUPS);
 
+const GARBAGE_INTERVAL = 10000;
+const SURVIVE_TIME = 90000;
+const LINES_TIME_LIMIT = 120000;
+const LINES_TARGET = 40;
+const REVERSE_ROTATION_LEVEL = 3;
+
+const CHALLENGES = {
+  lines_time: { desc: `Limpia ${LINES_TARGET} líneas en 2:00`, timeLimit: LINES_TIME_LIMIT, targetLines: LINES_TARGET },
+  garbage: { desc: `Sobrevive ${SURVIVE_TIME / 1000}s con basura`, garbageInterval: GARBAGE_INTERVAL, surviveTime: SURVIVE_TIME },
+  preset: { desc: 'Tablero con bloques fijos', presetFill: true },
+  invisible: { desc: 'Piezas invisibles al tocar la pila', invisibleOnGround: true },
+  reverseRotation: { desc: `Rotación inversa desde nivel ${REVERSE_ROTATION_LEVEL}`, reverseFromLevel: REVERSE_ROTATION_LEVEL },
+};
+
 const GRID_COLORS = {
   dark: '#22222e',
   light: '#d3d3e0',
@@ -86,11 +100,17 @@ const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const powerupStatusEl = document.getElementById('powerup-status');
 const comboStatusEl = document.getElementById('combo-status');
+const challengeStatusSection = document.getElementById('challenge-status-section');
+const challengeDescEl = document.getElementById('challenge-desc');
+const challengeProgressEl = document.getElementById('challenge-progress');
+const menuOverlay = document.getElementById('menu-overlay');
+const menuBtn = document.getElementById('menu-btn');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let nextPowerupAt, pendingPowerups, freezeLeft;
 let combo, lastClearWasDifficult, lastActionWasRotate, floatingTexts;
 let audioCtx;
+let challenge, challengeTimeLeft, challengeSurvived, garbageAccum;
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -138,7 +158,8 @@ function tryRotate() {
     if (current.powerup === 'ray') current.dir = current.dir === 'h' ? 'v' : 'h';
     return;
   }
-  const rotated = rotateCW(current.shape);
+  const reversed = challenge?.reverseFromLevel && level >= challenge.reverseFromLevel;
+  const rotated = reversed ? rotateCW(rotateCW(rotateCW(current.shape))) : rotateCW(current.shape);
   const kicks = [0, -1, 1, -2, 2];
   for (const kick of kicks) {
     if (!collide(rotated, current.x + kick, current.y)) {
@@ -306,6 +327,10 @@ function lockPiece() {
   }
   const cleared = clearLines();
   applyScoring(cleared, tSpin);
+  if (challenge?.targetLines && lines >= challenge.targetLines) {
+    endGame(true);
+    return;
+  }
   spawn();
 }
 
@@ -375,6 +400,31 @@ function applyPowerup() {
   }
 }
 
+function addGarbageRow() {
+  if (board[0].some(v => v !== 0)) {
+    endGame(false);
+    return;
+  }
+  board.shift();
+  const gapCol = Math.floor(Math.random() * COLS);
+  const row = Array.from({ length: COLS }, (_, c) => c === gapCol ? 0 : Math.floor(Math.random() * 7) + 1);
+  board.push(row);
+  if (collide(current.shape, current.x, current.y)) endGame(false);
+}
+
+function applyPresetFill() {
+  for (let r = ROWS - 6; r < ROWS; r++) {
+    let filledCount = 0;
+    for (let c = 0; c < COLS; c++) {
+      if (Math.random() < 0.55) {
+        board[r][c] = Math.floor(Math.random() * 7) + 1;
+        filledCount++;
+      }
+    }
+    if (filledCount === COLS) board[r][Math.floor(Math.random() * COLS)] = 0;
+  }
+}
+
 function compactBoard() {
   for (let c = 0; c < COLS; c++) {
     const colVals = [];
@@ -408,6 +458,22 @@ function updateHUD() {
     powerupStatusEl.textContent = `en ${nextPowerupAt - lines}`;
   }
   comboStatusEl.textContent = combo >= 2 ? `x${combo}` : '-';
+
+  if (!challenge) {
+    challengeStatusSection.hidden = true;
+    return;
+  }
+  challengeStatusSection.hidden = false;
+  challengeDescEl.textContent = challenge.desc;
+  if (challenge.timeLimit) {
+    const secs = Math.max(0, Math.ceil(challengeTimeLeft / 1000));
+    challengeProgressEl.textContent = `${lines}/${challenge.targetLines} líneas · ${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`;
+  } else if (challenge.surviveTime) {
+    const secs = Math.max(0, Math.ceil((challenge.surviveTime - challengeSurvived) / 1000));
+    challengeProgressEl.textContent = `Faltan ${secs}s`;
+  } else {
+    challengeProgressEl.textContent = '';
+  }
 }
 
 function drawBlock(context, x, y, colorIndex, size, alpha) {
@@ -473,24 +539,30 @@ function draw() {
     for (let c = 0; c < COLS; c++)
       drawBlock(ctx, c, r, board[r][c], BLOCK);
 
+  const grounded = challenge?.invisibleOnGround && !current.powerup && collide(current.shape, current.x, current.y + 1);
+
   // ghost
-  const gy = ghostY();
-  if (current.powerup) {
-    drawPowerup(ctx, current.x, gy, current, BLOCK, 0.3);
-  } else {
-    for (let r = 0; r < current.shape.length; r++)
-      for (let c = 0; c < current.shape[r].length; c++)
-        if (current.shape[r][c])
-          drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
+  if (!grounded) {
+    const gy = ghostY();
+    if (current.powerup) {
+      drawPowerup(ctx, current.x, gy, current, BLOCK, 0.3);
+    } else {
+      for (let r = 0; r < current.shape.length; r++)
+        for (let c = 0; c < current.shape[r].length; c++)
+          if (current.shape[r][c])
+            drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
+    }
   }
 
   // current piece
-  if (current.powerup) {
-    drawPowerup(ctx, current.x, current.y, current, BLOCK);
-  } else {
-    for (let r = 0; r < current.shape.length; r++)
-      for (let c = 0; c < current.shape[r].length; c++)
-        drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+  if (!grounded) {
+    if (current.powerup) {
+      drawPowerup(ctx, current.x, current.y, current, BLOCK);
+    } else {
+      for (let r = 0; r < current.shape.length; r++)
+        for (let c = 0; c < current.shape[r].length; c++)
+          drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+    }
   }
 
   // freeze overlay
@@ -529,10 +601,14 @@ function drawNext() {
       drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB);
 }
 
-function endGame() {
+function endGame(challengeSuccess) {
   gameOver = true;
   cancelAnimationFrame(animId);
-  overlayTitle.textContent = 'GAME OVER';
+  if (challenge) {
+    overlayTitle.textContent = challengeSuccess ? '¡DESAFÍO SUPERADO!' : 'DESAFÍO FALLIDO';
+  } else {
+    overlayTitle.textContent = 'GAME OVER';
+  }
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
   overlay.classList.remove('hidden');
 }
@@ -555,6 +631,25 @@ function loop(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
   updateEffects(dt);
+
+  if (challenge?.timeLimit) {
+    challengeTimeLeft -= dt;
+    if (challengeTimeLeft <= 0) { endGame(false); return; }
+  }
+  if (challenge?.surviveTime) {
+    challengeSurvived += dt;
+    if (challengeSurvived >= challenge.surviveTime) { endGame(true); return; }
+  }
+  if (challenge?.garbageInterval) {
+    garbageAccum += dt;
+    if (garbageAccum >= challenge.garbageInterval) {
+      garbageAccum = 0;
+      addGarbageRow();
+      if (gameOver) return;
+    }
+  }
+  updateHUD();
+
   if (freezeLeft > 0) {
     freezeLeft = Math.max(0, freezeLeft - dt);
     dropAccum = 0;
@@ -577,7 +672,8 @@ function loop(ts) {
   animId = requestAnimationFrame(loop);
 }
 
-function init() {
+function init(challengeKey) {
+  if (challengeKey !== undefined) challenge = CHALLENGES[challengeKey] || null;
   board = createBoard();
   score = 0;
   lines = 0;
@@ -594,10 +690,15 @@ function init() {
   lastClearWasDifficult = false;
   lastActionWasRotate = false;
   floatingTexts = [];
+  challengeTimeLeft = challenge?.timeLimit ?? 0;
+  challengeSurvived = 0;
+  garbageAccum = 0;
+  if (challenge?.presetFill) applyPresetFill();
   next = randomPiece();
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  menuOverlay.classList.add('hidden');
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
@@ -627,6 +728,14 @@ document.addEventListener('keydown', e => {
   updateHUD();
 });
 
-restartBtn.addEventListener('click', init);
+restartBtn.addEventListener('click', () => init());
 
-init();
+menuBtn.addEventListener('click', () => {
+  cancelAnimationFrame(animId);
+  overlay.classList.add('hidden');
+  menuOverlay.classList.remove('hidden');
+});
+
+document.querySelectorAll('.challenge-btn').forEach(btn => {
+  btn.addEventListener('click', () => init(btn.dataset.challenge));
+});

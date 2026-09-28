@@ -19,6 +19,7 @@ Implementación del clásico **Tetris** en JavaScript vanilla, usando HTML5 Canv
   - [Controles](#controles)
   - [Power-ups](#power-ups)
   - [Combo y multiplicadores](#combo-y-multiplicadores)
+  - [Modo desafío](#modo-desafío)
   - [Cómo funciona](#cómo-funciona)
     - [1. `index.html`](#1-indexhtml)
     - [2. `style.css`](#2-stylecss)
@@ -47,6 +48,7 @@ Es una versión jugable del Tetris clásico con todas las mecánicas que esperar
 - **Pausa** y **Game Over** con opción de reinicio.
 - **Power-ups aleatorios**: cada 5 líneas eliminadas aparece una pieza especial de 1 celda con un efecto (ver [Power-ups](#power-ups)).
 - **Modo combo y multiplicadores**: encadenar líneas, T-spins, Back-to-Back y Perfect Clear multiplican la puntuación, con aviso visual y sonoro (ver [Combo y multiplicadores](#combo-y-multiplicadores)).
+- **Modo desafío**: al iniciar se elige entre partida normal o uno de 5 objetivos especiales (ver [Modo desafío](#modo-desafío)).
 
 ---
 
@@ -122,6 +124,22 @@ Además de la puntuación base (`LINE_SCORES`), se suman estos bonus:
 | **Perfect Clear**      | La limpieza de líneas deja el tablero completamente vacío.                        | 800 / 1200 / 1800 / 2000 según líneas limpiadas |
 
 Cada bonus dispara un texto flotante sobre el tablero (`COMBO x3!`, `T-SPIN!`, `BACK-TO-BACK!`, `PERFECT CLEAR!`) y un tono generado con la Web Audio API (sin archivos de audio externos).
+
+---
+
+## Modo desafío
+
+Al abrir el juego aparece un menú para elegir modo. Además del **modo normal**, hay 5 desafíos con objetivo propio (panel lateral `DESAFÍO`) y su propia condición de victoria/derrota:
+
+| Desafío              | Objetivo                                                                                          |
+| --------------------- | --------------------------------------------------------------------------------------------------- |
+| **Contrarreloj**       | Limpiar 40 líneas antes de que se acabe un cronómetro de 2 minutos.                                 |
+| **Basura ascendente**  | Sobrevivir 90 segundos mientras cada 10s sube una fila de "basura" desde abajo (con un hueco).      |
+| **Bloques fijos**      | Partida normal pero el tablero empieza con las 6 filas inferiores parcialmente rellenas.             |
+| **Piezas invisibles**  | La pieza actual (y su fantasma) se vuelve invisible en el instante en que ya no puede bajar más.    |
+| **Rotación inversa**   | A partir del nivel 3, `↑`/`X` rota en sentido antihorario en lugar de horario.                       |
+
+Al terminar un desafío el overlay muestra **¡DESAFÍO SUPERADO!** o **DESAFÍO FALLIDO** en vez de "GAME OVER". El botón **Cambiar modo** (en el overlay de pausa/fin de partida) vuelve al menú de selección.
 
 ---
 

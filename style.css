@@ -259,3 +259,55 @@ kbd {
 #restart-btn:hover {
   background: var(--btn-hover-bg);
 }
+
+#menu-btn {
+  margin-top: 4px;
+  background: transparent;
+  color: var(--controls-text);
+  border: 1px solid var(--board-border);
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#menu-btn:hover {
+  color: var(--text-color);
+}
+
+.menu-box {
+  max-width: 320px;
+}
+
+.challenge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.challenge-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  background: var(--kbd-bg);
+  border: 1px solid var(--board-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.challenge-btn:hover {
+  border-color: var(--btn-bg);
+}
+
+.challenge-btn strong {
+  font-size: 13px;
+}
+
+.challenge-btn span {
+  font-size: 11px;
+  color: var(--controls-text);
+}
