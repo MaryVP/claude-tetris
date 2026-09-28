@@ -17,6 +17,7 @@ Implementación del clásico **Tetris** en JavaScript vanilla, usando HTML5 Canv
     - [Opción 1: abrir el archivo directamente](#opción-1-abrir-el-archivo-directamente)
     - [Opción 2: servidor local (recomendado)](#opción-2-servidor-local-recomendado)
   - [Controles](#controles)
+  - [Power-ups](#power-ups)
   - [Cómo funciona](#cómo-funciona)
     - [1. `index.html`](#1-indexhtml)
     - [2. `style.css`](#2-stylecss)
@@ -43,6 +44,7 @@ Es una versión jugable del Tetris clásico con todas las mecánicas que esperar
 - **Sistema de puntuación** clásico de Tetris (100 / 300 / 500 / 800 multiplicado por nivel).
 - **Niveles** que aumentan cada 10 líneas y aceleran la caída.
 - **Pausa** y **Game Over** con opción de reinicio.
+- **Power-ups aleatorios**: cada 5 líneas eliminadas aparece una pieza especial de 1 celda con un efecto (ver [Power-ups](#power-ups)).
 
 ---
 
@@ -86,6 +88,22 @@ Después abre `http://localhost:8000` en el navegador.
 | `↓`       | Soft drop (bajar más rápido)      |
 | `Espacio` | Hard drop (caída instantánea)     |
 | `P`       | Pausar / reanudar                 |
+
+---
+
+## Power-ups
+
+Cada **5 líneas** eliminadas (`POWERUP_EVERY`), la siguiente pieza en `NEXT` es reemplazada por una pieza especial de una sola celda. Se controla como cualquier pieza (mover con `←`/`→`, bajar con `↓`/`Espacio`) y su efecto se aplica al fijarse en el tablero, centrado en la celda donde aterriza:
+
+| Icono | Power-up   | Efecto                                                                 |
+| ----- | ---------- | ----------------------------------------------------------------------- |
+| 💣    | Bomba      | Destruye el área 3×3 alrededor del punto de aterrizaje.                |
+| ⚡    | Rayo       | Limpia la fila completa. Pulsa `↑`/`X` antes de soltarla para cambiar a modo vertical y limpiar la columna en su lugar. |
+| 🎨    | Tinte      | Convierte todos los bloques del color debajo del punto de aterrizaje en **comodines**: cuentan para completar líneas pero las piezas pueden atravesarlos. |
+| 🌀    | Gravedad   | Compacta el tablero: cada columna cae hasta eliminar los huecos.        |
+| ❄     | Congelar   | Detiene la caída automática durante 5 segundos (el jugador sigue pudiendo mover/rotar/bajar). |
+
+El panel lateral (`POWER-UP`) muestra cuántas líneas faltan para el próximo power-up, o el tiempo restante de Congelar mientras está activo.
 
 ---
 

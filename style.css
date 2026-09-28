@@ -168,6 +168,10 @@ body {
   letter-spacing: 1px;
 }
 
+.value.small {
+  font-size: 14px;
+}
+
 #next-canvas {
   display: block;
   border: 1px solid var(--board-border);
