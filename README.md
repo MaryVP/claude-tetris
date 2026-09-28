@@ -18,6 +18,7 @@ Implementación del clásico **Tetris** en JavaScript vanilla, usando HTML5 Canv
     - [Opción 2: servidor local (recomendado)](#opción-2-servidor-local-recomendado)
   - [Controles](#controles)
   - [Power-ups](#power-ups)
+  - [Combo y multiplicadores](#combo-y-multiplicadores)
   - [Cómo funciona](#cómo-funciona)
     - [1. `index.html`](#1-indexhtml)
     - [2. `style.css`](#2-stylecss)
@@ -45,6 +46,7 @@ Es una versión jugable del Tetris clásico con todas las mecánicas que esperar
 - **Niveles** que aumentan cada 10 líneas y aceleran la caída.
 - **Pausa** y **Game Over** con opción de reinicio.
 - **Power-ups aleatorios**: cada 5 líneas eliminadas aparece una pieza especial de 1 celda con un efecto (ver [Power-ups](#power-ups)).
+- **Modo combo y multiplicadores**: encadenar líneas, T-spins, Back-to-Back y Perfect Clear multiplican la puntuación, con aviso visual y sonoro (ver [Combo y multiplicadores](#combo-y-multiplicadores)).
 
 ---
 
@@ -104,6 +106,22 @@ Cada **5 líneas** eliminadas (`POWERUP_EVERY`), la siguiente pieza en `NEXT` es
 | ❄     | Congelar   | Detiene la caída automática durante 5 segundos (el jugador sigue pudiendo mover/rotar/bajar). |
 
 El panel lateral (`POWER-UP`) muestra cuántas líneas faltan para el próximo power-up, o el tiempo restante de Congelar mientras está activo.
+
+---
+
+## Combo y multiplicadores
+
+Fijar piezas que limpian líneas en turnos consecutivos (sin fallar ninguna en el medio) hace crecer un contador de **combo**: la 2ª limpieza consecutiva multiplica la puntuación de esa jugada por `×2`, la 3ª por `×3`, y así sucesivamente. El panel (`COMBO`) muestra el multiplicador activo; una jugada que no limpia ninguna línea reinicia el combo a cero.
+
+Además de la puntuación base (`LINE_SCORES`), se suman estos bonus:
+
+| Bonus                | Cuándo se activa                                                                 | Puntos base (× nivel)     |
+| --------------------- | --------------------------------------------------------------------------------- | -------------------------- |
+| **T-spin**             | La última pieza fue una **T**, la última acción fue rotarla (no moverla) y al menos 3 de las 4 esquinas de su caja 3×3 están ocupadas al fijarse (regla de las 3 esquinas). | 400 sin líneas / 800 single / 1200 double / 1600 triple |
+| **Back-to-Back (B2B)** | Un Tetris (4 líneas) o T-spin con líneas justo después de otro Tetris/T-spin, sin una limpieza "normal" en el medio. | ×1.5 sobre la puntuación de esa jugada |
+| **Perfect Clear**      | La limpieza de líneas deja el tablero completamente vacío.                        | 800 / 1200 / 1800 / 2000 según líneas limpiadas |
+
+Cada bonus dispara un texto flotante sobre el tablero (`COMBO x3!`, `T-SPIN!`, `BACK-TO-BACK!`, `PERFECT CLEAR!`) y un tono generado con la Web Audio API (sin archivos de audio externos).
 
 ---
 
