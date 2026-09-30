@@ -41,6 +41,11 @@
         </div>
 
         <div class="panel-section">
+          <span class="label">RESERVA</span>
+          <canvas id="hold-canvas" width="120" height="120"></canvas>
+        </div>
+
+        <div class="panel-section">
           <span class="label">POWER-UP</span>
           <span class="value small" id="powerup-status"></span>
         </div>
@@ -48,6 +53,17 @@
         <div class="panel-section">
           <span class="label">COMBO</span>
           <span class="value small" id="combo-status">-</span>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">ENERGÍA</span>
+          <div class="energy-track"><div class="energy-fill" id="energy-fill"></div></div>
+          <span class="value small" id="energy-status">0/100</span>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">VISIÓN</span>
+          <canvas id="queue-canvas" width="80" height="300"></canvas>
         </div>
 
         <div class="panel-section" id="challenge-status-section" hidden>
@@ -64,9 +80,38 @@
             <li><kbd>↓</kbd> bajar</li>
             <li><kbd>Space</kbd> caída</li>
             <li><kbd>P</kbd> pausa</li>
+            <li><kbd>C</kbd> habilidad</li>
           </ul>
         </div>
       </aside>
+    </div>
+
+    <div id="skill-overlay" class="overlay hidden">
+      <div class="overlay-box menu-box">
+        <p id="skill-overlay-title">ELEGIR HABILIDAD</p>
+        <div class="challenge-list">
+          <button class="challenge-btn skill-btn" data-skill="peek">
+            <strong>1. Ver siguientes 5 piezas</strong>
+            <span>Revela la cola de piezas por 15s.</span>
+          </button>
+          <button class="challenge-btn skill-btn" data-skill="swap">
+            <strong>2. Cambiar pieza</strong>
+            <span>Cambia la pieza actual por otra al azar.</span>
+          </button>
+          <button class="challenge-btn skill-btn" data-skill="slow">
+            <strong>3. Ralentizar tiempo</strong>
+            <span>Reduce la velocidad de caída 10s.</span>
+          </button>
+          <button class="challenge-btn skill-btn" data-skill="undo">
+            <strong>4. Deshacer última colocación</strong>
+            <span>Revierte la última pieza fijada.</span>
+          </button>
+          <button class="challenge-btn skill-btn" data-skill="hold">
+            <strong>5. Reservar pieza</strong>
+            <span>Guarda la pieza actual para usar después.</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div id="overlay" class="overlay hidden">
