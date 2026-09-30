@@ -158,6 +158,16 @@ body {
   gap: 4px;
 }
 
+.panel-row {
+  display: flex;
+  gap: 8px;
+}
+
+.panel-row .panel-section {
+  flex: 1;
+  min-width: 0;
+}
+
 .label {
   font-size: 10px;
   letter-spacing: 2px;

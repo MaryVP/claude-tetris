@@ -35,24 +35,26 @@
           <span class="value" id="level">1</span>
         </div>
 
-        <div class="panel-section">
-          <span class="label">NEXT</span>
-          <canvas id="next-canvas" width="120" height="120"></canvas>
+        <div class="panel-row">
+          <div class="panel-section">
+            <span class="label">NEXT</span>
+            <canvas id="next-canvas" width="70" height="70"></canvas>
+          </div>
+          <div class="panel-section">
+            <span class="label">RESERVA</span>
+            <canvas id="hold-canvas" width="70" height="70"></canvas>
+          </div>
         </div>
 
-        <div class="panel-section">
-          <span class="label">RESERVA</span>
-          <canvas id="hold-canvas" width="120" height="120"></canvas>
-        </div>
-
-        <div class="panel-section">
-          <span class="label">POWER-UP</span>
-          <span class="value small" id="powerup-status"></span>
-        </div>
-
-        <div class="panel-section">
-          <span class="label">COMBO</span>
-          <span class="value small" id="combo-status">-</span>
+        <div class="panel-row">
+          <div class="panel-section">
+            <span class="label">POWER-UP</span>
+            <span class="value small" id="powerup-status"></span>
+          </div>
+          <div class="panel-section">
+            <span class="label">COMBO</span>
+            <span class="value small" id="combo-status">-</span>
+          </div>
         </div>
 
         <div class="panel-section">
@@ -63,7 +65,7 @@
 
         <div class="panel-section">
           <span class="label">VISIÓN</span>
-          <canvas id="queue-canvas" width="64" height="240" hidden></canvas>
+          <canvas id="queue-canvas" width="56" height="210" hidden></canvas>
         </div>
 
         <div class="panel-section" id="challenge-status-section" hidden>

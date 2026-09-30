@@ -728,7 +728,7 @@ function drawEffects() {
 }
 
 function drawNext() {
-  const NB = 30;
+  const NB = 17;
   nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
   if (next.powerup) {
     drawPowerup(nextCtx, 1, 1, next, NB);
@@ -743,7 +743,7 @@ function drawNext() {
 }
 
 function drawHold() {
-  const HB = 30;
+  const HB = 17;
   holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
   if (!holdPiece) return;
   const shape = holdPiece.shape;
@@ -758,7 +758,7 @@ function drawQueue() {
   queueCanvas.hidden = peekLeft <= 0;
   queueCtx.clearRect(0, 0, queueCanvas.width, queueCanvas.height);
   if (peekLeft <= 0) return;
-  const QB = 16, SLOT = 3;
+  const QB = 14, SLOT = 3;
   queue.forEach((p, i) => {
     const baseRow = i * SLOT;
     if (p.powerup) {
