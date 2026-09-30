@@ -755,9 +755,10 @@ function drawHold() {
 }
 
 function drawQueue() {
+  queueCanvas.hidden = peekLeft <= 0;
   queueCtx.clearRect(0, 0, queueCanvas.width, queueCanvas.height);
   if (peekLeft <= 0) return;
-  const QB = 20, SLOT = 3;
+  const QB = 16, SLOT = 3;
   queue.forEach((p, i) => {
     const baseRow = i * SLOT;
     if (p.powerup) {
